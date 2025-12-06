@@ -1,76 +1,43 @@
-import os
-from pypdf import PdfReader
+from chromadb.utils import embedding_functions
+from transformers import pipeline
 from chromadb import PersistentClient
-from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
 
-# Step 1: Load PDF
+# Load embedding function again for search
+embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name="all-MiniLM-L6-v2"
+)
 
-def load_pdf(pdf_path):
-    reader = PdfReader(pdf_path)
-    text = ""
+# Reload existing chroma db
+def load_db():
+    client = PersistentClient(path="chroma_db")
+    return client.get_collection("pdf_chunks")
 
-    for page in reader.pages:
-
-        content = page.extract_text()
-        if content:
-            text += content + " "
-        
-        return text
-    
-# Step 2: Text Chunking
-
-def chunk_text(text, chunk_size=350):
-    words = text.split()
-    chunks = []
-    current_chunk = []
-
-    for word in words:
-        current_chunk.append(word)
-        if len(current_chunk) >= chunk_size:
-            chunks.append(" ".join(current_chunk))
-            current_chunk = []
-    
-    if current_chunk:
-        chunks.append(" ".join(current_chunk))
-
-    return chunks
-
-# Step 3: Create Embeddings + Store in ChromaDB
-
-def store_embeddings(chunks):
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-
-    client = PersistentClient(path="./chroma_db")
-
-    collection = client.get_or_create_collection("pdf_chunks")
-
-    embeddings = model.encode(chunks).tolist()
-    ids = [f"chunk_{i}" for i in range(len(chunks))]
-
-    collection.add(
-        documents=chunks,
-        embeddings=embeddings,
-        ids=ids
+# Search relevant chunks
+def get_relevant_chunks(question, top_k=3):
+    collection = load_db()
+    results = collection.query(
+        query_texts=[question],
+        n_results=top_k
     )
+    return results["documents"][0]
 
-    print(f"Stored {len(chunks)} chunks in ChromaDB! ✅")
+# Ask LLM with context
+def answer_question(question):
+    chunks = get_relevant_chunks(question)
+
+    context = "\n\n".join(chunks)
+
+    prompt = f"Use ONLY the context below to answer.\n\nContext:{context}\n\nQuestion: {question}\nAnswer:"
+
+    llm = pipeline("text-generation", model="distilbert/distilgpt2") # Free HuggingFace model
+
+    response = llm(prompt, max_length=300, do_sample=True)[0]["generated_text"]
+    return response
+
 
 if __name__ == "__main__":
 
-    pdf_path = "../data/sample.pdf"
-
-    if not os.path.exists(pdf_path):
-        print("PDF not found! Put sample.pdf in this folder.")
-        exit()
-
-    print("📌 Loading PDF...")
-    text = load_pdf(pdf_path)
-
-    print("✂ Splitting into chunks...")
-    chunks = chunk_text(text)
-
-    print("🧠 Creating embeddings and saving to Chroma...")
-    store_embeddings(chunks)
-
-    print("\n🚀 Done! You now have a Vector DB memory for your PDF.")
+    print("Ask a question about your PDF:")
+    user_q = input("> ")
+    ans = answer_question(user_q)
+    print("\n Answer:\n", ans)
