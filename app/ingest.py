@@ -14,9 +14,9 @@ def load_pdf(pdf_path):
 
         content = page.extract_text()
         if content:
-            text += content + " "
+            text += content + "\n\n"
         
-        return text
+    return text
     
 # Step 2: Text Chunking
 
@@ -54,7 +54,7 @@ def store_embeddings(chunks):
         ids=ids
     )
 
-    print(f"Stored {len(chunks)} chunks in ChromaDB! ✅")
+    print(f"Stored {len(chunks)} chunks in ChromaDB!")
 
 if __name__ == "__main__":
 
@@ -64,13 +64,13 @@ if __name__ == "__main__":
         print("PDF not found! Put sample.pdf in this folder.")
         exit()
 
-    print("📌 Loading PDF...")
+    print("Loading PDF...")
     text = load_pdf(pdf_path)
 
-    print("✂ Splitting into chunks...")
+    print("Splitting into chunks...")
     chunks = chunk_text(text)
 
-    print("🧠 Creating embeddings and saving to Chroma...")
+    print("Creating embeddings and saving to Chroma...")
     store_embeddings(chunks)
 
-    print("\n🚀 Done! You now have a Vector DB memory for your PDF.")
+    print("\nDone! You now have a Vector DB memory for your PDF.")
