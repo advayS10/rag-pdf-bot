@@ -1,6 +1,6 @@
-import chroma_db
+from app import chroma_db
 from typing import List, Dict, Any
-from embeddings import embed_text
+from app.embeddings import embed_text
 from chromadb.utils import embedding_functions
 from transformers import pipeline
 from chromadb import PersistentClient
@@ -9,7 +9,11 @@ import os
 CHROMA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "chroma_db"))
 COLLECTION_NAME = "pdf_chunks"
 
-
+llm = pipeline(
+    "text-generation",
+    model="TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    device=-1
+)
 
 # DB Helper
 def load_collection():
@@ -83,7 +87,7 @@ def answer_question(question:str, top_k:int=3):
         FINAL ANSWER:
         """
     # Use a small local model for demo. You can swap this with a better HF model or an API.
-    llm = pipeline("text-generation",model="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+    
 
     output = llm(prompt, max_new_tokens=256, truncation=True, do_sample=False, temperature=0.1)[0]["generated_text"]
     
