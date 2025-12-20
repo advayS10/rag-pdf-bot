@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RAG PDF Bot</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>📄 RAG PDF Bot</h1>
+
+  <!-- Upload PDF -->
+  <section>
+    <h3>Upload PDF</h3>
+    <input type="file" id="pdfFile" accept=".pdf" />
+    <button onclick="uploadPDF()">Upload</button>
+    <p id="uploadStatus"></p>
+  </section>
+
+  <hr />
+
+  <!-- Ask Question -->
+  <section>
+    <h3>Ask a Question</h3>
+    <input
+      type="text"
+      id="questionInput"
+      placeholder="Ask something about the PDF..."
+    />
+    <button onclick="askQuestion()">Ask</button>
+    <pre id="answerBox"></pre>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

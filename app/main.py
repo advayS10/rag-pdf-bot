@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import QuestionRequest, AnswerResponse
 from app.rag_pipeline import answer_question
 from app.ingest import load_pdf, chunk_text, store_embeddings
@@ -6,6 +7,14 @@ import os
 import shutil
 
 app = FastAPI(title="RAG PDF BOT") #This initializes a FastAPI application. FastAPI automatically handles request validation, async support, and API documentation using OpenAPI.
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)

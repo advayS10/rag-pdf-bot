@@ -1,0 +1,77 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 700px;
+  margin: 40px auto;
+  background: #0f172a; /* dark blue/gray */
+  color: #e5e7eb;      /* light text */
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #38bdf8; /* cyan */
+}
+
+h3 {
+  color: #f8fafc;
+}
+
+section {
+  background: #020617; /* darker card */
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+input[type="file"],
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 6px;
+}
+
+input::placeholder {
+  color: #94a3b8;
+}
+
+button {
+  padding: 10px 14px;
+  margin-left: 6px;
+  background: #38bdf8;
+  color: #020617;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #0ea5e9;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: #334155;
+  margin: 30px 0;
+}
+
+pre {
+  background: #020617;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  white-space: pre-wrap;
+  color: #e5e7eb;
+  margin-top: 15px;
+}
+
+#uploadStatus {
+  margin-top: 10px;
+  color: #a5f3fc;
+}
