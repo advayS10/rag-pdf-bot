@@ -41,9 +41,15 @@ def chunk_text(text, chunk_size=350):
 def store_embeddings(chunks):
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    client = PersistentClient(path="./chroma_db")
+    client = PersistentClient(path="../chroma_db")
 
     collection = client.get_or_create_collection("pdf_chunks")
+
+    # clear old embeddings
+    existing = collection.get()
+    if existing["ids"]:
+        collection.delete(ids=existing["ids"])
+
 
     embeddings = model.encode(chunks).tolist()
     ids = [f"chunk_{i}" for i in range(len(chunks))]

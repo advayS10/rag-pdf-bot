@@ -2,34 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RAG PDF Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG PDF Bot - AI Document Assistant</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  
+  <!-- Animated background -->
+  <div class="bg-animation"></div>
 
-  <h1>📄 RAG PDF Bot</h1>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <h1>DocQuery</h1>
+          <p class="subtitle">AI-Powered Document Intelligence</p>
+        </div>
+      </div>
+    </header>
 
-  <!-- Upload PDF -->
-  <section>
-    <h3>Upload PDF</h3>
-    <input type="file" id="pdfFile" accept=".pdf" />
-    <button onclick="uploadPDF()">Upload</button>
-    <p id="uploadStatus"></p>
-  </section>
+    <!-- Upload Section -->
+    <section class="card upload-card">
+      <div class="card-header">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Upload Document</h2>
+      </div>
+      
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="pdfFile" accept=".pdf" />
+        <label for="pdfFile" class="upload-label">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 18V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 15L12 12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="upload-text">Drop PDF here or click to browse</span>
+          <span class="upload-subtext">PDF files only, max 50MB</span>
+        </label>
+      </div>
 
-  <hr />
+      <button class="btn btn-primary" onclick="uploadPDF()" id="uploadBtn" disabled>
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Upload & Process
+      </button>
 
-  <!-- Ask Question -->
-  <section>
-    <h3>Ask a Question</h3>
-    <input
-      type="text"
-      id="questionInput"
-      placeholder="Ask something about the PDF..."
-    />
-    <button onclick="askQuestion()">Ask</button>
-    <pre id="answerBox"></pre>
-  </section>
+      <div class="status-message" id="uploadStatus"></div>
+    </section>
+
+    <!-- Chat Section -->
+    <section class="card chat-card">
+      <div class="card-header">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0034 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Ask Questions</h2>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="welcome-message">
+          <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="8" r="1" fill="currentColor"/>
+          </svg>
+          <p>Upload a PDF document to start asking questions</p>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input
+          type="text"
+          id="questionInput"
+          class="question-input"
+          placeholder="Ask anything about your document..."
+          onkeypress="handleKeyPress(event)"
+        />
+        <button class="btn btn-send" onclick="askQuestion()" id="askBtn">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </div>
 
   <script src="script.js"></script>
 </body>

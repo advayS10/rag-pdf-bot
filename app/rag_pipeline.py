@@ -1,12 +1,10 @@
-from app import chroma_db
 from typing import List, Dict, Any
 from app.embeddings import embed_text
-from chromadb.utils import embedding_functions
 from transformers import pipeline
 from chromadb import PersistentClient
 import os 
 
-CHROMA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "chroma_db"))
+CHROMA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../chroma_db"))
 COLLECTION_NAME = "pdf_chunks"
 
 llm = pipeline(
