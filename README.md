@@ -16,6 +16,14 @@ The system reads the PDF, creates embeddings, stores them in a vector database, 
 - LLM: HuggingFace Transformers
 - Frontend: HTML, CSS, JavaScript
 
+## RAG pipeline
+```
+PDF → Chunk Text → Embeddings → Vector DB
+                                 ↑
+                                 |
+User Question → Embedding → Similarity Search → Relevant Chunks → LLM
+```
+
 ## 📂 Project Structure
 ```
 rag-pdf-bot/
