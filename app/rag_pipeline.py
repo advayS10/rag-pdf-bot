@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from app.embeddings import embed_text
+from embeddings import embed_text
 from transformers import pipeline
 from chromadb import PersistentClient
 import os 
@@ -88,13 +88,9 @@ def answer_question(question:str, top_k:int=3):
     
 
     output = llm(prompt, max_new_tokens=256, truncation=True, do_sample=False, temperature=0.1)[0]["generated_text"]
-    
-    # print("Output", output)
-    # print("======== Before Answer ========")
-    # Remove the prompt prefix from the returned text if present:
+        
     answer = output.split("ANSWER:")[-1].strip()
 
-    # Simple cleanup: If model invented irrelevant text, keep first 300 chars (still demo)
     return answer
 
 

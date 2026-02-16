@@ -1,8 +1,8 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from app.schemas import QuestionRequest, AnswerResponse
-from app.rag_pipeline import answer_question
-from app.ingest import load_pdf, chunk_text, store_embeddings
+from schemas import QuestionRequest, AnswerResponse
+from rag_pipeline import answer_question
+from ingest import load_pdf, chunk_text, store_embeddings
 import os
 import shutil
 
@@ -29,15 +29,43 @@ def health_check():
 # File uploads are I/O-bound operations, so using async improves performance by allowing the server to handle other requests while waiting for file operations
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
+    """Save the uploaded PDF, run ingestion and return stats.
+
+    This handler now performs basic validation and handles errors so
+    that the caller receives an appropriate HTTP status instead of a
+    raw traceback.
+    """
+
+    # server‑side validation: content type and file extension
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
+
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Filename must end with .pdf")
+
+    # check file size without loading entire file into memory
+    file.file.seek(0, os.SEEK_END)
+    size = file.file.tell()
+    file.file.seek(0)
+    MAX_SIZE = 50 * 1024 * 1024  # 50 MB
+    if size > MAX_SIZE:
+        raise HTTPException(status_code=413, detail="File too large. Max 50MB allowed.")
+
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    text = load_pdf(file_path)
-    chunks = chunk_text(text)
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    store_embeddings(chunks)
+        text = load_pdf(file_path)
+        chunks = chunk_text(text)
+
+        store_embeddings(chunks)
+
+    except Exception as e:
+        # log the exception for debugging (could use logging module later)
+        print("Error during upload/ingest:", e)
+        raise HTTPException(status_code=500, detail="Failed to process PDF.")
 
     return {
         "message": "PDF uploaded and processed successfully",
@@ -48,7 +76,17 @@ async def upload_pdf(file: UploadFile = File(...)):
 # Pydantic schemas ensure type safety, request validation, and clear API contracts between frontend and backend.
 @app.post("/ask", response_model=AnswerResponse)
 def ask_question(payload: QuestionRequest):
-    answer = answer_question(payload.question)
+    """Return an answer for the supplied question.
+
+    Wrap the call to the RAG pipeline so that failures are translated
+    into a 500 response rather than crashing the server.
+    """
+    try:
+        answer = answer_question(payload.question)
+    except Exception as e:
+        print("Error during question answering:", e)
+        raise HTTPException(status_code=500, detail="Error generating answer.")
+
     return AnswerResponse(answer=answer)
 
 
