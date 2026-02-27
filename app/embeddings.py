@@ -4,7 +4,7 @@ from typing import List
 _MODEL_NAME = "all-MiniLM-L6-v2"
 _model = None
 
-def get_embedding_mode():
+def get_embedding_model():
     global _model
     if _model is None:
         _model = SentenceTransformer(_MODEL_NAME)
@@ -12,7 +12,7 @@ def get_embedding_mode():
 
 def embed_texts(texts: List[str]):
     
-    model = get_embedding_mode()
+    model = get_embedding_model()
     embeds = model.encode(texts)
 
     return embeds.tolist()

@@ -67,8 +67,7 @@ def answer_question(question:str, top_k:int=3):
 
     # Prompt template: strictly instruct the model to use ONLY the context.
     prompt = f"""
-        You are a helpful AI assistant. Your job is to answer the user's question 
-        using ONLY the information provided in the CONTEXT below.
+        You are a helpful AI assistant. Your job is to answer the user's question using ONLY the information provided in the CONTEXT below.
 
         STRICT RULES:
         1. If the answer is not clearly stated in the context, reply exactly:
