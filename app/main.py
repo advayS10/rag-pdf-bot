@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import QuestionRequest, AnswerResponse
 from rag_pipeline import answer_question
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploaded_pdfs"
+UPLOAD_DIR = "../uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # A health-check endpoint is used to verify if the service is running and reachable, often used by monitoring tools or load balancers.
@@ -52,6 +52,8 @@ async def upload_pdf(file: UploadFile = File(...)):
         raise HTTPException(status_code=413, detail="File too large. Max 50MB allowed.")
 
     file_path = os.path.join(UPLOAD_DIR, file.filename)
+
+    print(f"file_path: {file_path}")
 
     try:
         with open(file_path, "wb") as buffer:

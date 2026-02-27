@@ -41,7 +41,13 @@ def chunk_text(text, chunk_size=350):
 def store_embeddings(chunks):
     model = SentenceTransformer("all-MiniLM-L6-v2")
 
+    if not model:
+        raise RuntimeError("Failed to load embedding model")
+
     client = PersistentClient(path="../chroma_db")
+
+    if not client:
+        raise RuntimeError("Failed to connect to ChromaDB")
 
     collection = client.get_or_create_collection("pdf_chunks")
 

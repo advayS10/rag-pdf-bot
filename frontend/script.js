@@ -61,7 +61,7 @@ async function uploadPDF() {
     const data = await response.json();
     showStatus(
       statusDiv,
-      `✓ Document processed successfully! ${data.chunks_stored} chunks indexed.`,
+      `✓ Document processed successfully! ${data.chunk_stored} chunks indexed.`,
       "success"
     );
 

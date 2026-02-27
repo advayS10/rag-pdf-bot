@@ -13,6 +13,10 @@ def get_embedding_model():
 def embed_texts(texts: List[str]):
     
     model = get_embedding_model()
+
+    if not model:
+        raise RuntimeError("Failed to load embedding model")
+
     embeds = model.encode(texts)
 
     return embeds.tolist()
